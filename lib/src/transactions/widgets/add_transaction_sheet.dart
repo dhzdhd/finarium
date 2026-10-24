@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:fpdart/fpdart.dart';
 
 enum TransactionType { expense, income, subscription }
 
@@ -6,7 +8,7 @@ enum SubscriptionFrequency { daily, weekly, monthly, quarterly, yearly }
 
 enum SubscriptionReminder { none, sameDay, oneDay, threeDays, oneWeek }
 
-class AddTransactionSheet extends StatefulWidget {
+class AddTransactionSheet extends ConsumerStatefulWidget {
   const AddTransactionSheet({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -20,15 +22,16 @@ class AddTransactionSheet extends StatefulWidget {
   }
 
   @override
-  State<AddTransactionSheet> createState() => _AddTransactionSheetState();
+  ConsumerState<AddTransactionSheet> createState() =>
+      _AddTransactionSheetState();
 }
 
-class _AddTransactionSheetState extends State<AddTransactionSheet> {
+class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   var _type = TransactionType.expense;
   var _date = DateTime.now();
 
   var _frequency = SubscriptionFrequency.monthly;
-  DateTime? _endDate;
+  var _endDate = Option<DateTime>.none();
   var _autoRenew = true;
   var _reminder = SubscriptionReminder.oneDay;
 
@@ -161,24 +164,25 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
       InkWell(
         borderRadius: BorderRadius.circular(4),
         onTap: () async {
-          final picked = await _pickDate(_endDate ?? _date);
-          if (picked != null) setState(() => _endDate = picked);
+          final picked = await _pickDate(_endDate.getOrElse(() => _date));
+          if (picked != null) setState(() => _endDate = Some(picked));
         },
         child: InputDecorator(
           decoration: InputDecoration(
             labelText: 'Ends on (optional)',
-            suffixIcon: _endDate == null
-                ? const Icon(Icons.calendar_today_outlined)
-                : IconButton(
-                    icon: const Icon(Icons.clear),
-                    onPressed: () => setState(() => _endDate = null),
-                  ),
+            suffixIcon: switch (_endDate) {
+              None() => const Icon(Icons.calendar_today_outlined),
+              Some() => IconButton(
+                icon: const Icon(Icons.clear),
+                onPressed: () => setState(() => _endDate = None()),
+              ),
+            },
             border: const OutlineInputBorder(),
           ),
-          child: Text(
-            _endDate == null ? 'Never' : _formatDate(_endDate!),
-            style: dateStyle,
-          ),
+          child: Text(switch (_endDate) {
+            None() => 'Never',
+            Some(:final value) => _formatDate(value),
+          }, style: dateStyle),
         ),
       ),
       DropdownButtonFormField<SubscriptionReminder>(
@@ -279,7 +283,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                 ),
               ),
             ]),
-            const Divider(),
             _section(context, 'Category & payment', [
               DropdownButtonFormField<String>(
                 initialValue: 'Food & dining',
@@ -316,7 +319,6 @@ class _AddTransactionSheetState extends State<AddTransactionSheet> {
                 onChanged: (_) {},
               ),
             ]),
-            const Divider(),
             _section(context, 'Schedule', _scheduleFields(context)),
             Row(
               children: [
