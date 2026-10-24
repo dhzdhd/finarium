@@ -1,5 +1,6 @@
 import 'package:finarium/src/routes.dart';
 import 'package:finarium/src/settings/controllers/theme_controller.dart';
+import 'package:finarium/src/transactions/widgets/add_transaction_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -40,7 +41,7 @@ class NavScaffold extends ConsumerWidget {
         child: FloatingActionButton.extended(
           label: Text('Add transaction'),
           icon: Icon(Icons.add),
-          onPressed: null,
+          onPressed: () => AddTransactionSheet.show(context),
         ),
       ),
       bottomNavigationBar: NavigationBar(
