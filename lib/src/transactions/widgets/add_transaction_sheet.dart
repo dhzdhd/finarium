@@ -1,12 +1,9 @@
+import 'package:finarium/src/transactions/models/transaction.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
 
 enum TransactionType { expense, income, subscription }
-
-enum SubscriptionFrequency { daily, weekly, monthly, quarterly, yearly }
-
-enum SubscriptionReminder { none, sameDay, oneDay, threeDays, oneWeek }
 
 class AddTransactionSheet extends ConsumerStatefulWidget {
   const AddTransactionSheet({super.key});
