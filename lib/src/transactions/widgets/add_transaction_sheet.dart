@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 enum TransactionType { expense, income, subscription }
 
@@ -7,7 +6,7 @@ enum SubscriptionFrequency { daily, weekly, monthly, quarterly, yearly }
 
 enum SubscriptionReminder { none, sameDay, oneDay, threeDays, oneWeek }
 
-class AddTransactionSheet extends ConsumerStatefulWidget {
+class AddTransactionSheet extends StatefulWidget {
   const AddTransactionSheet({super.key});
 
   static Future<void> show(BuildContext context) {
@@ -21,11 +20,10 @@ class AddTransactionSheet extends ConsumerStatefulWidget {
   }
 
   @override
-  ConsumerState<AddTransactionSheet> createState() =>
-      _AddTransactionSheetState();
+  State<AddTransactionSheet> createState() => _AddTransactionSheetState();
 }
 
-class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
+class _AddTransactionSheetState extends State<AddTransactionSheet> {
   var _type = TransactionType.expense;
   var _date = DateTime.now();
 
@@ -71,25 +69,62 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
 
   String _frequencyLabel(SubscriptionFrequency frequency) {
     return switch (frequency) {
-      .daily => 'Daily',
-      .weekly => 'Weekly',
-      .monthly => 'Monthly',
-      .quarterly => 'Quarterly',
-      .yearly => 'Yearly',
+      SubscriptionFrequency.daily => 'Daily',
+      SubscriptionFrequency.weekly => 'Weekly',
+      SubscriptionFrequency.monthly => 'Monthly',
+      SubscriptionFrequency.quarterly => 'Quarterly',
+      SubscriptionFrequency.yearly => 'Yearly',
     };
   }
 
   String _reminderLabel(SubscriptionReminder reminder) {
     return switch (reminder) {
-      .none => 'No reminder',
-      .sameDay => 'On the day',
-      .oneDay => '1 day before',
-      .threeDays => '3 days before',
-      .oneWeek => '1 week before',
+      SubscriptionReminder.none => 'No reminder',
+      SubscriptionReminder.sameDay => 'On the day',
+      SubscriptionReminder.oneDay => '1 day before',
+      SubscriptionReminder.threeDays => '3 days before',
+      SubscriptionReminder.oneWeek => '1 week before',
     };
   }
 
-  List<Widget> _subscriptionFields() {
+  Widget _section(BuildContext context, String title, List<Widget> children) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: 12,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.labelLarge
+              ?.copyWith(color: Theme.of(context).colorScheme.onSurfaceVariant),
+        ),
+        ...children,
+      ],
+    );
+  }
+
+  List<Widget> _scheduleFields(BuildContext context) {
+    final dateStyle = Theme.of(context).textTheme.titleMedium;
+
+    if (!_isSubscription) {
+      return [
+        InkWell(
+          borderRadius: BorderRadius.circular(4),
+          onTap: () async {
+            final picked = await _pickDate(_date);
+            if (picked != null) setState(() => _date = picked);
+          },
+          child: InputDecorator(
+            decoration: const InputDecoration(
+              labelText: 'Date',
+              suffixIcon: Icon(Icons.calendar_today_outlined),
+              border: OutlineInputBorder(),
+            ),
+            child: Text(_formatDate(_date), style: dateStyle),
+          ),
+        ),
+      ];
+    }
+
     return [
       DropdownButtonFormField<SubscriptionFrequency>(
         initialValue: _frequency,
@@ -108,7 +143,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           if (value != null) setState(() => _frequency = value);
         },
       ),
-      const SizedBox(height: 12),
       InkWell(
         borderRadius: BorderRadius.circular(4),
         onTap: () async {
@@ -121,13 +155,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             suffixIcon: Icon(Icons.calendar_today_outlined),
             border: OutlineInputBorder(),
           ),
-          child: Text(
-            _formatDate(_date),
-            style: Theme.of(context).textTheme.titleMedium,
-          ),
+          child: Text(_formatDate(_date), style: dateStyle),
         ),
       ),
-      const SizedBox(height: 12),
       InkWell(
         borderRadius: BorderRadius.circular(4),
         onTap: () async {
@@ -147,11 +177,10 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
           ),
           child: Text(
             _endDate == null ? 'Never' : _formatDate(_endDate!),
-            style: Theme.of(context).textTheme.titleMedium,
+            style: dateStyle,
           ),
         ),
       ),
-      const SizedBox(height: 12),
       DropdownButtonFormField<SubscriptionReminder>(
         initialValue: _reminder,
         decoration: const InputDecoration(
@@ -194,6 +223,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
+          spacing: 20,
           children: [
             Row(
               children: [
@@ -209,7 +239,6 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 ),
               ],
             ),
-            const SizedBox(height: 8),
             SegmentedButton<TransactionType>(
               showSelectedIcon: true,
               segments: const [
@@ -231,84 +260,64 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 setState(() => _type = selection.first);
               },
             ),
-            const SizedBox(height: 16),
-            TextField(
-              keyboardType: const TextInputType.numberWithOptions(
-                decimal: true,
-              ),
-              style: theme.textTheme.headlineSmall,
-              decoration: const InputDecoration(
-                labelText: 'Amount',
-                prefixText: '₹ ',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            const TextField(
-              decoration: InputDecoration(
-                labelText: 'Merchant or note',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              initialValue: 'Food & dining',
-              decoration: const InputDecoration(
-                labelText: 'Category',
-                border: OutlineInputBorder(),
-              ),
-              items: const [
-                DropdownMenuItem(
-                  value: 'Food & dining',
-                  child: Text('Food & dining'),
+            _section(context, 'Details', [
+              TextField(
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
                 ),
-                DropdownMenuItem(value: 'Travel', child: Text('Travel')),
-                DropdownMenuItem(value: 'Shopping', child: Text('Shopping')),
-              ],
-              onChanged: (_) {},
-            ),
-            const SizedBox(height: 12),
-            DropdownButtonFormField<String>(
-              initialValue: 'Travel card ••4242',
-              decoration: const InputDecoration(
-                labelText: 'Paid from',
-                border: OutlineInputBorder(),
+                style: theme.textTheme.headlineSmall,
+                decoration: const InputDecoration(
+                  labelText: 'Amount',
+                  prefixText: '₹ ',
+                  border: OutlineInputBorder(),
+                ),
               ),
-              items: const [
-                DropdownMenuItem(
-                  value: 'Travel card ••4242',
-                  child: Text('Travel card ••4242'),
+              const TextField(
+                decoration: InputDecoration(
+                  labelText: 'Merchant or note',
+                  border: OutlineInputBorder(),
                 ),
-                DropdownMenuItem(
-                  value: 'Savings ••1108',
-                  child: Text('Savings ••1108'),
+              ),
+            ]),
+            const Divider(),
+            _section(context, 'Category & payment', [
+              DropdownButtonFormField<String>(
+                initialValue: 'Food & dining',
+                decoration: const InputDecoration(
+                  labelText: 'Category',
+                  border: OutlineInputBorder(),
                 ),
-              ],
-              onChanged: (_) {},
-            ),
-            const SizedBox(height: 12),
-            if (_isSubscription)
-              ..._subscriptionFields()
-            else
-              InkWell(
-                borderRadius: BorderRadius.circular(4),
-                onTap: () async {
-                  final picked = await _pickDate(_date);
-                  if (picked != null) setState(() => _date = picked);
-                },
-                child: InputDecorator(
-                  decoration: const InputDecoration(
-                    labelText: 'Date',
-                    suffixIcon: Icon(Icons.calendar_today_outlined),
-                    border: OutlineInputBorder(),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'Food & dining',
+                    child: Text('Food & dining'),
                   ),
-                  child: Text(
-                    _formatDate(_date),
-                    style: theme.textTheme.titleMedium,
-                  ),
-                ),
+                  DropdownMenuItem(value: 'Travel', child: Text('Travel')),
+                  DropdownMenuItem(value: 'Shopping', child: Text('Shopping')),
+                ],
+                onChanged: (_) {},
               ),
-            const SizedBox(height: 24),
+              DropdownButtonFormField<String>(
+                initialValue: 'Travel card ••4242',
+                decoration: const InputDecoration(
+                  labelText: 'Paid from',
+                  border: OutlineInputBorder(),
+                ),
+                items: const [
+                  DropdownMenuItem(
+                    value: 'Travel card ••4242',
+                    child: Text('Travel card ••4242'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Savings ••1108',
+                    child: Text('Savings ••1108'),
+                  ),
+                ],
+                onChanged: (_) {},
+              ),
+            ]),
+            const Divider(),
+            _section(context, 'Schedule', _scheduleFields(context)),
             Row(
               children: [
                 TextButton(
