@@ -1,4 +1,5 @@
 import 'package:finarium/src/analytics/views/analytics_view.dart';
+import 'package:finarium/src/cards/views/cards_view.dart';
 import 'package:finarium/src/app.dart';
 import 'package:finarium/src/settings/views/settings_view.dart';
 import 'package:finarium/src/transactions/views/transaction_view.dart';
@@ -61,7 +62,7 @@ final class CardsRoute() implements Route {
   Icon get selectedIcon => const Icon(Icons.credit_card);
 
   @override
-  Widget call() => TransactionView();
+  Widget call() => CardsView();
 }
 
 final class BudgetsRoute() implements Route {

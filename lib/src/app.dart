@@ -1,3 +1,4 @@
+import 'package:finarium/src/cards/widgets/add_card_dialog.dart';
 import 'package:finarium/src/routes.dart';
 import 'package:finarium/src/settings/controllers/theme_controller.dart';
 import 'package:finarium/src/transactions/widgets/add_transaction_sheet.dart';
@@ -28,22 +29,23 @@ class NavScaffold extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final currentRoute = routes.elementAt(navShell.currentIndex);
-    final isTransactionRoute = switch (currentRoute) {
-      TransactionsRoute() => true,
-      _ => false,
-    };
 
     return Scaffold(
       appBar: AppBar(title: Text(currentRoute.name)),
       body: navShell,
-      floatingActionButton: Visibility(
-        visible: isTransactionRoute,
-        child: FloatingActionButton.extended(
+      floatingActionButton: switch (currentRoute) {
+        TransactionsRoute() => FloatingActionButton.extended(
           label: Text('Add transaction'),
           icon: Icon(Icons.add),
           onPressed: () => AddTransactionSheet.show(context),
         ),
-      ),
+        CardsRoute() => FloatingActionButton.extended(
+          label: Text('Add card'),
+          icon: Icon(Icons.add),
+          onPressed: () => AddCardDialog.show(context),
+        ),
+        _ => null,
+      },
       bottomNavigationBar: NavigationBar(
         selectedIndex: navShell.currentIndex,
         onDestinationSelected: (idx) => navShell.goBranch(
