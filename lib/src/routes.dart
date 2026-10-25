@@ -1,3 +1,4 @@
+import 'package:finarium/src/analytics/views/analytics_view.dart';
 import 'package:finarium/src/app.dart';
 import 'package:finarium/src/settings/views/settings_view.dart';
 import 'package:finarium/src/transactions/views/transaction_view.dart';
@@ -94,7 +95,7 @@ final class AnalyticsRoute() implements Route {
   Icon get selectedIcon => const Icon(Icons.analytics);
 
   @override
-  Widget call() => TransactionView();
+  Widget call() => AnalyticsView();
 }
 
 final routes = [
