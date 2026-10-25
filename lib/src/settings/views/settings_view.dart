@@ -77,13 +77,13 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           children: [
             SettingsSwitchTile(
               title: 'Autofill in apps and browsers',
-              subtitle: 'Fills number and expiry after you approve',
+              subtitle: 'Fills card credentials on approval',
               value: _autofill,
               onChanged: (value) => setState(() => _autofill = value),
             ),
             SettingsSwitchTile(
               title: 'Ask for biometrics every time',
-              subtitle: 'Fingerprint or face unlock before each fill',
+              subtitle: 'Asks for fingerprint/face unlock before each autofill',
               value: _biometrics,
               onChanged: (value) => setState(() => _biometrics = value),
             ),
@@ -123,8 +123,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
           children: [
             SettingsSwitchTile(
               title: 'Read bank SMS and notifications',
-              subtitle:
-                  'Detects transaction alerts from banks, UPI and wallet apps',
+              subtitle: 'Detects transaction alerts from mobile notifications',
               value: _captureAlerts,
               onChanged: (value) => setState(() => _captureAlerts = value),
             ),
