@@ -1,4 +1,5 @@
 import 'package:finarium/src/transactions/models/transaction.dart';
+import 'package:finarium/src/transactions/widgets/add_category_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fpdart/fpdart.dart';
@@ -31,6 +32,19 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   var _endDate = Option<DateTime>.none();
   var _autoRenew = true;
   var _reminder = SubscriptionReminder.oneDay;
+  final _categories = ['Food & dining', 'Travel', 'Shopping'];
+  var _category = 'Food & dining';
+
+  Future<void> _addCategory() async {
+    final result = await AddCategoryDialog.show(context);
+    result.match(
+      () {},
+      (name) => setState(() {
+        if (!_categories.contains(name)) _categories.add(name);
+        _category = name;
+      }),
+    );
+  }
 
   static const _months = [
     'Jan',
@@ -281,21 +295,35 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
               ),
             ]),
             _section(context, 'Category & payment', [
-              DropdownButtonFormField<String>(
-                initialValue: 'Food & dining',
-                decoration: const InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(),
-                ),
-                items: const [
-                  DropdownMenuItem(
-                    value: 'Food & dining',
-                    child: Text('Food & dining'),
+              Row(
+                spacing: 8,
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      key: ValueKey(_category),
+                      initialValue: _category,
+                      decoration: const InputDecoration(
+                        labelText: 'Category',
+                        border: OutlineInputBorder(),
+                      ),
+                      items: [
+                        for (final category in _categories)
+                          DropdownMenuItem(
+                            value: category,
+                            child: Text(category),
+                          ),
+                      ],
+                      onChanged: (value) {
+                        if (value != null) setState(() => _category = value);
+                      },
+                    ),
                   ),
-                  DropdownMenuItem(value: 'Travel', child: Text('Travel')),
-                  DropdownMenuItem(value: 'Shopping', child: Text('Shopping')),
+                  IconButton.filledTonal(
+                    tooltip: 'Add category',
+                    onPressed: _addCategory,
+                    icon: const Icon(Icons.add),
+                  ),
                 ],
-                onChanged: (_) {},
               ),
               DropdownButtonFormField<String>(
                 initialValue: 'Travel card ••4242',
