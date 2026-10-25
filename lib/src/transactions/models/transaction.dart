@@ -1,3 +1,5 @@
+import 'package:finarium/src/transactions/enums/capture_source.dart';
+import 'package:finarium/src/transactions/models/merchant.dart';
 import 'package:finarium/src/transactions/models/option_json_converters.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:fpdart/fpdart.dart';
@@ -11,12 +13,15 @@ enum SubscriptionReminder { none, sameDay, oneDay, threeDays, oneWeek }
 
 @freezed
 sealed class Transaction with _$Transaction {
+  const Transaction._();
+
   const factory Transaction.expense({
     required String id,
     required int amountMinor,
-    required String merchant,
+    required Merchant merchant,
     required String category,
     required String paymentSource,
+    required CaptureSource captureSource,
     required DateTime occurredAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -28,9 +33,10 @@ sealed class Transaction with _$Transaction {
   const factory Transaction.income({
     required String id,
     required int amountMinor,
-    required String merchant,
+    required Merchant merchant,
     required String category,
     required String paymentSource,
+    required CaptureSource captureSource,
     required DateTime occurredAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -42,9 +48,10 @@ sealed class Transaction with _$Transaction {
   const factory Transaction.subscription({
     required String id,
     required int amountMinor,
-    required String merchant,
+    required Merchant merchant,
     required String category,
     required String paymentSource,
+    required CaptureSource captureSource,
     required DateTime occurredAt,
     required DateTime createdAt,
     required DateTime updatedAt,
@@ -56,6 +63,11 @@ sealed class Transaction with _$Transaction {
     @Default(true) bool autoRenew,
     @Default(SubscriptionReminder.oneDay) SubscriptionReminder reminder,
   }) = SubscriptionTransaction;
+
+  bool get needsReview => switch (merchant) {
+    UnknownMerchant() => true,
+    NamedMerchant() => false,
+  };
 
   factory Transaction.fromJson(Map<String, dynamic> json) =>
       _$TransactionFromJson(json);

@@ -10,9 +10,10 @@ ExpenseTransaction _$ExpenseTransactionFromJson(Map<String, dynamic> json) =>
     ExpenseTransaction(
       id: json['id'] as String,
       amountMinor: (json['amountMinor'] as num).toInt(),
-      merchant: json['merchant'] as String,
+      merchant: Merchant.fromJson(json['merchant'] as Map<String, dynamic>),
       category: json['category'] as String,
       paymentSource: json['paymentSource'] as String,
+      captureSource: $enumDecode(_$CaptureSourceEnumMap, json['captureSource']),
       occurredAt: DateTime.parse(json['occurredAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -35,6 +36,7 @@ Map<String, dynamic> _$ExpenseTransactionToJson(ExpenseTransaction instance) =>
       'merchant': instance.merchant,
       'category': instance.category,
       'paymentSource': instance.paymentSource,
+      'captureSource': _$CaptureSourceEnumMap[instance.captureSource]!,
       'occurredAt': instance.occurredAt.toIso8601String(),
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
@@ -44,13 +46,19 @@ Map<String, dynamic> _$ExpenseTransactionToJson(ExpenseTransaction instance) =>
       'runtimeType': instance.$type,
     };
 
+const _$CaptureSourceEnumMap = {
+  CaptureSource.manual: 'manual',
+  CaptureSource.notification: 'notification',
+};
+
 IncomeTransaction _$IncomeTransactionFromJson(Map<String, dynamic> json) =>
     IncomeTransaction(
       id: json['id'] as String,
       amountMinor: (json['amountMinor'] as num).toInt(),
-      merchant: json['merchant'] as String,
+      merchant: Merchant.fromJson(json['merchant'] as Map<String, dynamic>),
       category: json['category'] as String,
       paymentSource: json['paymentSource'] as String,
+      captureSource: $enumDecode(_$CaptureSourceEnumMap, json['captureSource']),
       occurredAt: DateTime.parse(json['occurredAt'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
       updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -69,6 +77,7 @@ Map<String, dynamic> _$IncomeTransactionToJson(IncomeTransaction instance) =>
       'merchant': instance.merchant,
       'category': instance.category,
       'paymentSource': instance.paymentSource,
+      'captureSource': _$CaptureSourceEnumMap[instance.captureSource]!,
       'occurredAt': instance.occurredAt.toIso8601String(),
       'createdAt': instance.createdAt.toIso8601String(),
       'updatedAt': instance.updatedAt.toIso8601String(),
@@ -83,9 +92,10 @@ SubscriptionTransaction _$SubscriptionTransactionFromJson(
 ) => SubscriptionTransaction(
   id: json['id'] as String,
   amountMinor: (json['amountMinor'] as num).toInt(),
-  merchant: json['merchant'] as String,
+  merchant: Merchant.fromJson(json['merchant'] as Map<String, dynamic>),
   category: json['category'] as String,
   paymentSource: json['paymentSource'] as String,
+  captureSource: $enumDecode(_$CaptureSourceEnumMap, json['captureSource']),
   occurredAt: DateTime.parse(json['occurredAt'] as String),
   createdAt: DateTime.parse(json['createdAt'] as String),
   updatedAt: DateTime.parse(json['updatedAt'] as String),
@@ -113,6 +123,7 @@ Map<String, dynamic> _$SubscriptionTransactionToJson(
   'merchant': instance.merchant,
   'category': instance.category,
   'paymentSource': instance.paymentSource,
+  'captureSource': _$CaptureSourceEnumMap[instance.captureSource]!,
   'occurredAt': instance.occurredAt.toIso8601String(),
   'createdAt': instance.createdAt.toIso8601String(),
   'updatedAt': instance.updatedAt.toIso8601String(),
