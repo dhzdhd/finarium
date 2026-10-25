@@ -1,17 +1,33 @@
 import 'package:finarium/src/core/formatters.dart';
-import 'package:finarium/src/transactions/models/transaction_entry.dart';
+import 'package:finarium/src/transactions/enums/capture_source.dart';
+import 'package:finarium/src/transactions/models/merchant.dart';
+import 'package:finarium/src/transactions/models/transaction.dart';
 import 'package:flutter/material.dart';
 
 class TransactionListItem extends StatelessWidget {
-  const TransactionListItem({super.key, required this.entry});
+  const TransactionListItem({super.key, required this.transaction});
 
-  final TransactionEntry entry;
+  final Transaction transaction;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final amountColor = entry.isIncome ? colorScheme.primary : null;
+    final isIncome = transaction is IncomeTransaction;
+    final amountColor = isIncome ? colorScheme.primary : null;
+
+    final (name, initial) = switch (transaction.merchant) {
+      NamedMerchant(:final name) => (
+        name,
+        name.isEmpty ? '?' : name[0].toUpperCase(),
+      ),
+      UnknownMerchant() => ('Unknown merchant', '?'),
+    };
+
+    final source = switch (transaction.captureSource) {
+      CaptureSource.manual => 'Manual',
+      CaptureSource.notification => 'Notification',
+    };
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
@@ -21,7 +37,7 @@ class TransactionListItem extends StatelessWidget {
             radius: 24,
             backgroundColor: colorScheme.primaryContainer.withValues(alpha: 0.5),
             child: Text(
-              entry.initial,
+              initial,
               style: theme.textTheme.titleMedium?.copyWith(
                 color: colorScheme.primary,
               ),
@@ -32,9 +48,9 @@ class TransactionListItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(entry.merchant, style: theme.textTheme.titleMedium),
+                Text(name, style: theme.textTheme.titleMedium),
                 Text(
-                  entry.detail,
+                  '${transaction.category} · ${transaction.paymentSource}',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),
@@ -47,10 +63,10 @@ class TransactionListItem extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                '${entry.isIncome ? '+' : '−'}${formatInr(entry.amount)}',
+                '${isIncome ? '+' : '−'}${formatInr(transaction.amountMinor ~/ 100)}',
                 style: theme.textTheme.titleMedium?.copyWith(color: amountColor),
               ),
-              if (entry.needsReview)
+              if (transaction.needsReview)
                 Container(
                   margin: const EdgeInsets.only(top: 4),
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
@@ -65,9 +81,9 @@ class TransactionListItem extends StatelessWidget {
                     ),
                   ),
                 )
-              else if (entry.source.isNotEmpty)
+              else
                 Text(
-                  entry.source,
+                  source,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colorScheme.onSurfaceVariant,
                   ),

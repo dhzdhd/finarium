@@ -1,68 +1,89 @@
 import 'package:finarium/src/core/formatters.dart';
+import 'package:finarium/src/transactions/enums/capture_source.dart';
 import 'package:finarium/src/transactions/enums/transaction_filter.dart';
-import 'package:finarium/src/transactions/models/transaction_entry.dart';
+import 'package:finarium/src/transactions/models/merchant.dart';
+import 'package:finarium/src/transactions/models/transaction.dart';
 import 'package:finarium/src/transactions/widgets/budget_overview_card.dart';
 import 'package:finarium/src/transactions/widgets/transaction_filter_chips.dart';
 import 'package:finarium/src/transactions/widgets/transaction_list_item.dart';
 import 'package:flutter/material.dart';
 
-const _entries = [
-  TransactionEntry(
-    id: 't1',
-    initial: 'S',
-    merchant: 'Swiggy',
-    detail: 'Food & dining · Visa ••4242',
-    dayLabel: 'Today · 10 Oct',
-    amount: 486,
-    isIncome: false,
-    source: 'SMS',
-    needsReview: false,
-  ),
-  TransactionEntry(
-    id: 't2',
-    initial: 'N',
-    merchant: 'Netflix',
-    detail: 'Subscription · Visa ••4242',
-    dayLabel: 'Today · 10 Oct',
-    amount: 649,
-    isIncome: false,
-    source: 'Auto-detected',
-    needsReview: false,
-  ),
-  TransactionEntry(
-    id: 't3',
-    initial: '?',
-    merchant: 'UPI ••4521',
-    detail: 'Uncategorised',
-    dayLabel: 'Today · 10 Oct',
-    amount: 1200,
-    isIncome: false,
-    source: '',
-    needsReview: true,
-  ),
-  TransactionEntry(
-    id: 't4',
-    initial: 'A',
-    merchant: 'Acme Pvt Ltd',
-    detail: 'Salary · Account ••9012',
-    dayLabel: 'Yesterday · 9 Oct',
-    amount: 85000,
-    isIncome: true,
-    source: 'Manual',
-    needsReview: false,
-  ),
-  TransactionEntry(
-    id: 't5',
-    initial: 'U',
-    merchant: 'Uber',
-    detail: 'Transport · UPI',
-    dayLabel: 'Yesterday · 9 Oct',
-    amount: 212,
-    isIncome: false,
-    source: 'Notification',
-    needsReview: false,
-  ),
-];
+List<Transaction> _sampleTransactions(DateTime now) {
+  final today = DateTime(now.year, now.month, now.day, 18);
+  final yesterday = today.subtract(const Duration(days: 1));
+
+  return [
+    Transaction.expense(
+      id: 't1',
+      amountMinor: 48600,
+      merchant: const Merchant.named('Swiggy'),
+      category: 'Food & dining',
+      paymentSource: 'Visa ••4242',
+      captureSource: CaptureSource.notification,
+      occurredAt: today,
+      createdAt: today,
+      updatedAt: today,
+    ),
+    Transaction.subscription(
+      id: 't2',
+      amountMinor: 64900,
+      merchant: const Merchant.named('Netflix'),
+      category: 'Subscription',
+      paymentSource: 'Visa ••4242',
+      captureSource: CaptureSource.notification,
+      occurredAt: today,
+      createdAt: today,
+      updatedAt: today,
+      firstBillingDate: today,
+      frequency: SubscriptionFrequency.monthly,
+    ),
+    Transaction.expense(
+      id: 't3',
+      amountMinor: 120000,
+      merchant: const Merchant.unknown(),
+      category: 'Uncategorised',
+      paymentSource: 'UPI ••4521',
+      captureSource: CaptureSource.notification,
+      occurredAt: today,
+      createdAt: today,
+      updatedAt: today,
+    ),
+    Transaction.income(
+      id: 't4',
+      amountMinor: 8500000,
+      merchant: const Merchant.named('Acme Pvt Ltd'),
+      category: 'Salary',
+      paymentSource: 'Account ••9012',
+      captureSource: CaptureSource.manual,
+      occurredAt: yesterday,
+      createdAt: yesterday,
+      updatedAt: yesterday,
+    ),
+    Transaction.expense(
+      id: 't5',
+      amountMinor: 21200,
+      merchant: const Merchant.named('Uber'),
+      category: 'Transport',
+      paymentSource: 'UPI',
+      captureSource: CaptureSource.notification,
+      occurredAt: yesterday,
+      createdAt: yesterday,
+      updatedAt: yesterday,
+    ),
+  ];
+}
+
+String _dayLabel(DateTime date, DateTime now) {
+  final today = DateTime(now.year, now.month, now.day);
+  final day = DateTime(date.year, date.month, date.day);
+  final base = formatDayMonth(day);
+
+  return switch (today.difference(day).inDays) {
+    0 => 'Today · $base',
+    1 => 'Yesterday · $base',
+    _ => '$base ${day.year}',
+  };
+}
 
 class TransactionView extends StatefulWidget {
   const TransactionView({super.key});
@@ -74,20 +95,29 @@ class TransactionView extends StatefulWidget {
 class _TransactionViewState extends State<TransactionView> {
   var _filter = TransactionFilter.all;
 
-  List<TransactionEntry> get _filtered => switch (_filter) {
-    TransactionFilter.all => _entries,
-    TransactionFilter.expenses => _entries.where((e) => !e.isIncome).toList(),
-    TransactionFilter.income => _entries.where((e) => e.isIncome).toList(),
-    TransactionFilter.toReview => _entries.where((e) => e.needsReview).toList(),
-  };
+  List<Transaction> _filtered(List<Transaction> transactions) {
+    return switch (_filter) {
+      .all => transactions,
+      .expenses => transactions.whereType<ExpenseTransaction>().toList(),
+      .income => transactions.whereType<IncomeTransaction>().toList(),
+      .subscriptions =>
+        transactions.whereType<SubscriptionTransaction>().toList(),
+      .toReview => transactions.where((t) => t.needsReview).toList(),
+    };
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final groups = <String, List<TransactionEntry>>{};
-    for (final entry in _filtered) {
-      groups.putIfAbsent(entry.dayLabel, () => []).add(entry);
+    final now = DateTime.now();
+    final transactions = _filtered(_sampleTransactions(now));
+
+    final groups = <String, List<Transaction>>{};
+    for (final transaction in transactions) {
+      groups
+          .putIfAbsent(_dayLabel(transaction.occurredAt, now), () => [])
+          .add(transaction);
     }
 
     return Padding(
@@ -129,14 +159,18 @@ class _TransactionViewState extends State<TransactionView> {
                 for (final group in groups.entries) ...[
                   _DayHeader(
                     label: group.key,
-                    total: group.value.fold<int>(
+                    totalMinor: group.value.fold<int>(
                       0,
-                      (sum, e) => sum + (e.isIncome ? e.amount : -e.amount),
+                      (sum, t) =>
+                          sum +
+                          (t is IncomeTransaction
+                              ? t.amountMinor
+                              : -t.amountMinor),
                     ),
                   ),
-                  for (final entry in group.value) ...[
-                    TransactionListItem(entry: entry),
-                    if (entry != group.value.last) const Divider(height: 1),
+                  for (var i = 0; i < group.value.length; i++) ...[
+                    TransactionListItem(transaction: group.value[i]),
+                    if (i < group.value.length - 1) const Divider(height: 1),
                   ],
                   const SizedBox(height: 8),
                 ],
@@ -150,16 +184,16 @@ class _TransactionViewState extends State<TransactionView> {
 }
 
 class _DayHeader extends StatelessWidget {
-  const _DayHeader({required this.label, required this.total});
+  const _DayHeader({required this.label, required this.totalMinor});
 
   final String label;
-  final int total;
+  final int totalMinor;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-    final sign = total < 0 ? '−' : '+';
+    final sign = totalMinor < 0 ? '−' : '+';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
@@ -174,7 +208,7 @@ class _DayHeader extends StatelessWidget {
             ),
           ),
           Text(
-            '$sign${formatInr(total.abs())}',
+            '$sign${formatInr(totalMinor.abs() ~/ 100)}',
             style: theme.textTheme.titleSmall?.copyWith(
               color: colorScheme.onSurfaceVariant,
             ),
