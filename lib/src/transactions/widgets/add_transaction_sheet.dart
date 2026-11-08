@@ -1,3 +1,6 @@
+import 'package:finarium/src/transactions/controllers/transaction_controller.dart';
+import 'package:finarium/src/transactions/enums/capture_source.dart';
+import 'package:finarium/src/transactions/models/merchant.dart';
 import 'package:finarium/src/transactions/models/transaction.dart';
 import 'package:finarium/src/transactions/widgets/add_category_dialog.dart';
 import 'package:flutter/material.dart';
@@ -34,6 +37,19 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
   var _reminder = SubscriptionReminder.oneDay;
   final _categories = ['Food & dining', 'Travel', 'Shopping'];
   var _category = 'Food & dining';
+  var _paymentSource = 'Travel card ••4242';
+
+  final _amount = TextEditingController();
+  final _merchant = TextEditingController();
+  String? _amountError;
+  var _saving = false;
+
+  @override
+  void dispose() {
+    _amount.dispose();
+    _merchant.dispose();
+    super.dispose();
+  }
 
   Future<void> _addCategory() async {
     final result = await AddCategoryDialog.show(context);
@@ -44,6 +60,90 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
         _category = name;
       }),
     );
+  }
+
+  int? _parseAmountMinor(String input) {
+    final cleaned = input.replaceAll(',', '').trim();
+    final parts = cleaned.split('.');
+    final rupees = int.tryParse(parts.first);
+    if (rupees == null) return null;
+
+    final paise = parts.length > 1
+        ? int.tryParse(parts[1].padRight(2, '0').substring(0, 2))
+        : 0;
+    if (paise == null) return null;
+
+    final minor = rupees * 100 + paise;
+    return minor > 0 ? minor : null;
+  }
+
+  Future<void> _save() async {
+    final amountMinor = _parseAmountMinor(_amount.text);
+    if (amountMinor == null) {
+      setState(() => _amountError = 'Enter an amount');
+      return;
+    }
+
+    final now = DateTime.now();
+    final id = now.microsecondsSinceEpoch.toString();
+    final merchantText = _merchant.text.trim();
+    final merchant = merchantText.isEmpty
+        ? const Merchant.unknown()
+        : Merchant.named(merchantText);
+
+    final transaction = switch (_type) {
+      TransactionType.expense => Transaction.expense(
+        id: id,
+        amountMinor: amountMinor,
+        merchant: merchant,
+        category: _category,
+        paymentSource: _paymentSource,
+        captureSource: CaptureSource.manual,
+        occurredAt: _date,
+        createdAt: now,
+        updatedAt: now,
+      ),
+      TransactionType.income => Transaction.income(
+        id: id,
+        amountMinor: amountMinor,
+        merchant: merchant,
+        category: _category,
+        paymentSource: _paymentSource,
+        captureSource: CaptureSource.manual,
+        occurredAt: _date,
+        createdAt: now,
+        updatedAt: now,
+      ),
+      TransactionType.subscription => Transaction.subscription(
+        id: id,
+        amountMinor: amountMinor,
+        merchant: merchant,
+        category: _category,
+        paymentSource: _paymentSource,
+        captureSource: CaptureSource.manual,
+        occurredAt: _date,
+        createdAt: now,
+        updatedAt: now,
+        firstBillingDate: _date,
+        frequency: _frequency,
+        endDate: _endDate,
+        autoRenew: _autoRenew,
+        reminder: _reminder,
+      ),
+    };
+
+    setState(() => _saving = true);
+    try {
+      await ref.read(transactionsControllerProvider.notifier).save(transaction);
+      if (!mounted) return;
+      Navigator.pop(context);
+    } catch (_) {
+      if (!mounted) return;
+      setState(() => _saving = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not save transaction')),
+      );
+    }
   }
 
   static const _months = [
@@ -277,18 +377,27 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
             ),
             _section(context, 'Details', [
               TextField(
+                controller: _amount,
                 keyboardType: const TextInputType.numberWithOptions(
                   decimal: true,
                 ),
                 style: theme.textTheme.headlineSmall,
-                decoration: const InputDecoration(
+                onChanged: (_) {
+                  if (_amountError != null) {
+                    setState(() => _amountError = null);
+                  }
+                },
+                decoration: InputDecoration(
                   labelText: 'Amount',
                   prefixText: '₹ ',
-                  border: OutlineInputBorder(),
+                  errorText: _amountError,
+                  border: const OutlineInputBorder(),
                 ),
               ),
-              const TextField(
-                decoration: InputDecoration(
+              TextField(
+                controller: _merchant,
+                textCapitalization: TextCapitalization.words,
+                decoration: const InputDecoration(
                   labelText: 'Merchant or note',
                   border: OutlineInputBorder(),
                 ),
@@ -326,7 +435,7 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 ],
               ),
               DropdownButtonFormField<String>(
-                initialValue: 'Travel card ••4242',
+                initialValue: _paymentSource,
                 decoration: const InputDecoration(
                   labelText: 'Paid from',
                   border: OutlineInputBorder(),
@@ -341,7 +450,9 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                     child: Text('Savings ••1108'),
                   ),
                 ],
-                onChanged: (_) {},
+                onChanged: (value) {
+                  if (value != null) setState(() => _paymentSource = value);
+                },
               ),
             ]),
             _section(context, 'Schedule', _scheduleFields(context)),
@@ -357,12 +468,18 @@ class _AddTransactionSheetState extends ConsumerState<AddTransactionSheet> {
                 const SizedBox(width: 12),
                 Expanded(
                   child: FilledButton(
-                    onPressed: () {},
+                    onPressed: _saving ? null : _save,
                     style: FilledButton.styleFrom(
                       minimumSize: const Size.fromHeight(56),
                       shape: const StadiumBorder(),
                     ),
-                    child: const Text('Save transaction'),
+                    child: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2),
+                          )
+                        : const Text('Save transaction'),
                   ),
                 ),
               ],

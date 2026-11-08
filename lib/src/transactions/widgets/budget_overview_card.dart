@@ -74,12 +74,16 @@ class BudgetOverviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                '₹${_formatNumber(remaining)} left of ₹${_formatNumber(budget)}',
-                style: TextStyle(fontSize: 14, color: subTextColor),
+              Expanded(
+                child: Text(
+                  '₹${_formatNumber(remaining)} left of ₹${_formatNumber(budget)}',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14, color: subTextColor),
+                ),
               ),
+              const SizedBox(width: 8),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
