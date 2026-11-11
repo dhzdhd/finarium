@@ -7,7 +7,13 @@ edition = "2021"
 crate-type = ["cdylib", "staticlib"]
 
 [dependencies]
+aead = "0.6.1"
+anyhow = "1.0.104"
+argon2 = "0.6.0"
 flutter_rust_bridge = "=2.13.0"
+password-hash = { version = "0.6.1", features = ["phc"] }
+pbkdf2 = { version = "0.13.0", features = ["phc"] }
+scrypt = { version = "0.12.0", features = ["phc"] }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(frb_expand)'] }
