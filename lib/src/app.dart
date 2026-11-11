@@ -1,7 +1,8 @@
 import 'package:finarium/src/cards/widgets/add_card_dialog.dart';
 import 'package:finarium/src/core/breakpoints.dart';
 import 'package:finarium/src/routes.dart';
-import 'package:finarium/src/settings/controllers/theme_controller.dart';
+import 'package:finarium/src/settings/controllers/settings_controller.dart';
+import 'package:finarium/src/settings/theme.dart';
 import 'package:finarium/src/transactions/widgets/add_transaction_sheet.dart';
 import 'package:flutter/material.dart' hide Route;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,7 +13,9 @@ class FinariumApp extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final themeMode = ref.watch(themeModeProvider);
+    final themeMode = ref.watch(
+      settingsControllerProvider.select((settings) => settings.themeMode),
+    );
     return MaterialApp.router(
       routerConfig: router,
       theme: lightTheme,

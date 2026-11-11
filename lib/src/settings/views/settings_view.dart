@@ -1,4 +1,7 @@
-import 'package:finarium/src/settings/controllers/theme_controller.dart';
+import 'dart:io';
+
+import 'package:filesystem_picker/filesystem_picker.dart';
+import 'package:finarium/src/settings/controllers/settings_controller.dart';
 import 'package:finarium/src/settings/enums/auto_lock_duration.dart';
 import 'package:finarium/src/settings/enums/budget_alert_threshold.dart';
 import 'package:finarium/src/settings/widgets/backup_passphrase_dialog.dart';
@@ -7,24 +10,15 @@ import 'package:finarium/src/settings/widgets/settings_switch_tile.dart';
 import 'package:finarium/src/settings/widgets/settings_value_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path/path.dart' as p;
 
-class SettingsView extends ConsumerStatefulWidget {
+class SettingsView extends ConsumerWidget {
   const SettingsView({super.key});
 
   @override
-  ConsumerState<SettingsView> createState() => _SettingsViewState();
-}
-
-class _SettingsViewState extends ConsumerState<SettingsView> {
-  var _autofill = true;
-  var _biometrics = true;
-  var _captureAlerts = true;
-  var _autoLock = AutoLockDuration.oneMinute;
-  var _budgetThreshold = BudgetAlertThreshold.eighty;
-
-  @override
-  Widget build(BuildContext context) {
-    final themeMode = ref.watch(themeModeProvider);
+  Widget build(BuildContext context, WidgetRef ref) {
+    final settings = ref.watch(settingsControllerProvider);
+    final controller = ref.read(settingsControllerProvider.notifier);
 
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
@@ -37,7 +31,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
               leading: const Icon(Icons.palette_outlined),
               title: const Text('Theme'),
               trailing: DropdownButton<ThemeMode>(
-                value: themeMode,
+                value: settings.themeMode,
                 isDense: true,
                 underline: const SizedBox.shrink(),
                 borderRadius: BorderRadius.circular(12),
@@ -50,9 +44,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     ),
                 ],
                 onChanged: (mode) {
-                  if (mode != null) {
-                    ref.read(themeModeProvider.notifier).setThemeMode(mode);
-                  }
+                  if (mode != null) controller.setThemeMode(mode);
                 },
                 items: [
                   for (final mode in ThemeMode.values)
@@ -78,21 +70,21 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             SettingsSwitchTile(
               title: 'Autofill in apps and browsers',
               subtitle: 'Fills card credentials on approval',
-              value: _autofill,
-              onChanged: (value) => setState(() => _autofill = value),
+              value: settings.autofill,
+              onChanged: controller.setAutofill,
             ),
             SettingsSwitchTile(
               title: 'Ask for biometrics every time',
               subtitle: 'Asks for fingerprint/face unlock before each autofill',
-              value: _biometrics,
-              onChanged: (value) => setState(() => _biometrics = value),
+              value: settings.biometrics,
+              onChanged: controller.setBiometrics,
             ),
             ListTile(
               contentPadding: const EdgeInsets.symmetric(horizontal: 16),
               title: const Text('Auto-lock vault'),
               subtitle: const Text('Locks when idle or in the background'),
               trailing: DropdownButton<AutoLockDuration>(
-                value: _autoLock,
+                value: settings.autoLock,
                 isDense: true,
                 underline: const SizedBox.shrink(),
                 borderRadius: BorderRadius.circular(12),
@@ -105,7 +97,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     ),
                 ],
                 onChanged: (value) {
-                  if (value != null) setState(() => _autoLock = value);
+                  if (value != null) controller.setAutoLock(value);
                 },
                 items: [
                   for (final duration in AutoLockDuration.values)
@@ -124,12 +116,14 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             SettingsSwitchTile(
               title: 'Read bank SMS and notifications',
               subtitle: 'Detects transaction alerts from mobile notifications',
-              value: _captureAlerts,
-              onChanged: (value) => setState(() => _captureAlerts = value),
+              value: settings.captureAlerts,
+              onChanged: controller.setCaptureAlerts,
             ),
-            const SettingsValueTile(
+            SettingsSwitchTile(
               title: 'Gmail statements',
               subtitle: 'Reads statements for limits and due dates',
+              value: settings.gmailStatements,
+              onChanged: controller.setGmailStatements,
             ),
           ],
         ),
@@ -143,7 +137,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                 'Notify me when my spends cross a certain percentage of budget',
               ),
               trailing: DropdownButton<BudgetAlertThreshold>(
-                value: _budgetThreshold,
+                value: settings.budgetThreshold,
                 isDense: true,
                 underline: const SizedBox.shrink(),
                 borderRadius: BorderRadius.circular(12),
@@ -156,7 +150,7 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
                     ),
                 ],
                 onChanged: (value) {
-                  if (value != null) setState(() => _budgetThreshold = value);
+                  if (value != null) controller.setBudgetThreshold(value);
                 },
                 items: [
                   for (final threshold in BudgetAlertThreshold.values)
@@ -170,7 +164,12 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
             SettingsValueTile(
               title: 'Encrypted backup',
               subtitle: 'Export your data with a passphrase',
-              onTap: _showBackupDialog,
+              onTap: () => _showBackupDialog(context),
+            ),
+            SettingsValueTile(
+              title: 'Upload backup file',
+              subtitle: 'Restore data from an encrypted backup',
+              onTap: () => _uploadBackupFile(context),
             ),
           ],
         ),
@@ -178,10 +177,33 @@ class _SettingsViewState extends ConsumerState<SettingsView> {
     );
   }
 
-  Future<void> _showBackupDialog() {
+  Future<void> _showBackupDialog(BuildContext context) {
     return showDialog<void>(
       context: context,
       builder: (context) => const BackupPassphraseDialog(),
+    );
+  }
+
+  Future<void> _uploadBackupFile(BuildContext context) async {
+    Directory rootDirectory() {
+      if (Platform.isAndroid) return Directory('/storage/emulated/0');
+
+      final home =
+          Platform.environment['USERPROFILE'] ?? Platform.environment['HOME'];
+      return Directory(home ?? Directory.current.path);
+    }
+
+    final path = await FilesystemPicker.open(
+      title: 'Select backup file',
+      context: context,
+      rootDirectory: rootDirectory(),
+      fsType: FilesystemType.file,
+      fileTileSelectMode: FileTileSelectMode.wholeTile,
+    );
+    if (path == null || !context.mounted) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('Selected backup: ${p.basename(path)}')),
     );
   }
 
