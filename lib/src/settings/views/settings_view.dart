@@ -4,6 +4,7 @@ import 'package:filesystem_picker/filesystem_picker.dart';
 import 'package:finarium/src/settings/controllers/settings_controller.dart';
 import 'package:finarium/src/settings/enums/auto_lock_duration.dart';
 import 'package:finarium/src/settings/enums/budget_alert_threshold.dart';
+import 'package:finarium/src/settings/models/settings.dart';
 import 'package:finarium/src/settings/widgets/backup_passphrase_dialog.dart';
 import 'package:finarium/src/settings/widgets/settings_section.dart';
 import 'package:finarium/src/settings/widgets/settings_switch_tile.dart';
@@ -17,9 +18,65 @@ class SettingsView extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final settings = ref.watch(settingsControllerProvider);
+    final settingsAsync = ref.watch(settingsControllerProvider);
     final controller = ref.read(settingsControllerProvider.notifier);
 
+    if (settingsAsync.hasError && !settingsAsync.hasValue) {
+      return _SettingsError(
+        error: settingsAsync.error!,
+        onRetry: () => ref.invalidate(settingsControllerProvider),
+      );
+    }
+
+    return _SettingsList(
+      settings: settingsAsync.value ?? const Settings(),
+      controller: controller,
+    );
+  }
+}
+
+class _SettingsError extends StatelessWidget {
+  const _SettingsError({required this.error, required this.onRetry});
+
+  final Object error;
+  final VoidCallback onRetry;
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text('Could not load settings', style: theme.textTheme.titleMedium),
+            const SizedBox(height: 8),
+            Text(
+              '$error',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ),
+            const SizedBox(height: 12),
+            TextButton(onPressed: onRetry, child: const Text('Retry')),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _SettingsList extends StatelessWidget {
+  const _SettingsList({required this.settings, required this.controller});
+
+  final Settings settings;
+  final SettingsController controller;
+
+  @override
+  Widget build(BuildContext context) {
     return ListView(
       padding: const EdgeInsets.only(bottom: 24),
       children: [
@@ -185,18 +242,18 @@ class SettingsView extends ConsumerWidget {
   }
 
   Future<void> _uploadBackupFile(BuildContext context) async {
-    Directory rootDirectory() {
-      if (Platform.isAndroid) return Directory('/storage/emulated/0');
-
-      final home =
-          Platform.environment['USERPROFILE'] ?? Platform.environment['HOME'];
-      return Directory(home ?? Directory.current.path);
-    }
+    final rootDirectory = Directory(
+      Platform.isAndroid
+          ? '/storage/emulated/0'
+          : Platform.environment['USERPROFILE'] ??
+                Platform.environment['HOME'] ??
+                Directory.current.path,
+    );
 
     final path = await FilesystemPicker.open(
       title: 'Select backup file',
       context: context,
-      rootDirectory: rootDirectory(),
+      rootDirectory: rootDirectory,
       fsType: FilesystemType.file,
       fileTileSelectMode: FileTileSelectMode.wholeTile,
     );

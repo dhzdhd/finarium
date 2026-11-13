@@ -8,7 +8,9 @@ class ThemeSwitcher extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final themeMode = ref.watch(
-      settingsControllerProvider.select((settings) => settings.themeMode),
+      settingsControllerProvider.select(
+        (settings) => settings.value?.themeMode ?? ThemeMode.system,
+      ),
     );
 
     return PopupMenuButton<ThemeMode>(

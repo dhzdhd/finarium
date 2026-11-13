@@ -1795,20 +1795,573 @@ class BankCardsCompanion extends UpdateCompanion<BankCardRow> {
   }
 }
 
+class $AppSettingsTable extends AppSettings
+    with TableInfo<$AppSettingsTable, SettingsRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $AppSettingsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<ThemeMode, String> themeMode =
+      GeneratedColumn<String>(
+        'theme_mode',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<ThemeMode>($AppSettingsTable.$converterthemeMode);
+  static const VerificationMeta _autofillMeta = const VerificationMeta(
+    'autofill',
+  );
+  @override
+  late final GeneratedColumn<bool> autofill = GeneratedColumn<bool>(
+    'autofill',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("autofill" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _biometricsMeta = const VerificationMeta(
+    'biometrics',
+  );
+  @override
+  late final GeneratedColumn<bool> biometrics = GeneratedColumn<bool>(
+    'biometrics',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("biometrics" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _captureAlertsMeta = const VerificationMeta(
+    'captureAlerts',
+  );
+  @override
+  late final GeneratedColumn<bool> captureAlerts = GeneratedColumn<bool>(
+    'capture_alerts',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("capture_alerts" IN (0, 1))',
+    ),
+  );
+  static const VerificationMeta _gmailStatementsMeta = const VerificationMeta(
+    'gmailStatements',
+  );
+  @override
+  late final GeneratedColumn<bool> gmailStatements = GeneratedColumn<bool>(
+    'gmail_statements',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("gmail_statements" IN (0, 1))',
+    ),
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<AutoLockDuration, String>
+  autoLock = GeneratedColumn<String>(
+    'auto_lock',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  ).withConverter<AutoLockDuration>($AppSettingsTable.$converterautoLock);
+  @override
+  late final GeneratedColumnWithTypeConverter<BudgetAlertThreshold, String>
+  budgetThreshold =
+      GeneratedColumn<String>(
+        'budget_threshold',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<BudgetAlertThreshold>(
+        $AppSettingsTable.$converterbudgetThreshold,
+      );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    themeMode,
+    autofill,
+    biometrics,
+    captureAlerts,
+    gmailStatements,
+    autoLock,
+    budgetThreshold,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'app_settings';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<SettingsRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('autofill')) {
+      context.handle(
+        _autofillMeta,
+        autofill.isAcceptableOrUnknown(data['autofill']!, _autofillMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_autofillMeta);
+    }
+    if (data.containsKey('biometrics')) {
+      context.handle(
+        _biometricsMeta,
+        biometrics.isAcceptableOrUnknown(data['biometrics']!, _biometricsMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_biometricsMeta);
+    }
+    if (data.containsKey('capture_alerts')) {
+      context.handle(
+        _captureAlertsMeta,
+        captureAlerts.isAcceptableOrUnknown(
+          data['capture_alerts']!,
+          _captureAlertsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_captureAlertsMeta);
+    }
+    if (data.containsKey('gmail_statements')) {
+      context.handle(
+        _gmailStatementsMeta,
+        gmailStatements.isAcceptableOrUnknown(
+          data['gmail_statements']!,
+          _gmailStatementsMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_gmailStatementsMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  SettingsRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return SettingsRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      themeMode: $AppSettingsTable.$converterthemeMode.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}theme_mode'],
+        )!,
+      ),
+      autofill: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}autofill'],
+      )!,
+      biometrics: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}biometrics'],
+      )!,
+      captureAlerts: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}capture_alerts'],
+      )!,
+      gmailStatements: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}gmail_statements'],
+      )!,
+      autoLock: $AppSettingsTable.$converterautoLock.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}auto_lock'],
+        )!,
+      ),
+      budgetThreshold: $AppSettingsTable.$converterbudgetThreshold.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}budget_threshold'],
+        )!,
+      ),
+    );
+  }
+
+  @override
+  $AppSettingsTable createAlias(String alias) {
+    return $AppSettingsTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<ThemeMode, String, String> $converterthemeMode =
+      const EnumNameConverter<ThemeMode>(ThemeMode.values);
+  static JsonTypeConverter2<AutoLockDuration, String, String>
+  $converterautoLock = const EnumNameConverter<AutoLockDuration>(
+    AutoLockDuration.values,
+  );
+  static JsonTypeConverter2<BudgetAlertThreshold, String, String>
+  $converterbudgetThreshold = const EnumNameConverter<BudgetAlertThreshold>(
+    BudgetAlertThreshold.values,
+  );
+}
+
+class SettingsRow extends DataClass implements Insertable<SettingsRow> {
+  final int id;
+  final ThemeMode themeMode;
+  final bool autofill;
+  final bool biometrics;
+  final bool captureAlerts;
+  final bool gmailStatements;
+  final AutoLockDuration autoLock;
+  final BudgetAlertThreshold budgetThreshold;
+  const SettingsRow({
+    required this.id,
+    required this.themeMode,
+    required this.autofill,
+    required this.biometrics,
+    required this.captureAlerts,
+    required this.gmailStatements,
+    required this.autoLock,
+    required this.budgetThreshold,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    {
+      map['theme_mode'] = Variable<String>(
+        $AppSettingsTable.$converterthemeMode.toSql(themeMode),
+      );
+    }
+    map['autofill'] = Variable<bool>(autofill);
+    map['biometrics'] = Variable<bool>(biometrics);
+    map['capture_alerts'] = Variable<bool>(captureAlerts);
+    map['gmail_statements'] = Variable<bool>(gmailStatements);
+    {
+      map['auto_lock'] = Variable<String>(
+        $AppSettingsTable.$converterautoLock.toSql(autoLock),
+      );
+    }
+    {
+      map['budget_threshold'] = Variable<String>(
+        $AppSettingsTable.$converterbudgetThreshold.toSql(budgetThreshold),
+      );
+    }
+    return map;
+  }
+
+  AppSettingsCompanion toCompanion(bool nullToAbsent) {
+    return AppSettingsCompanion(
+      id: Value(id),
+      themeMode: Value(themeMode),
+      autofill: Value(autofill),
+      biometrics: Value(biometrics),
+      captureAlerts: Value(captureAlerts),
+      gmailStatements: Value(gmailStatements),
+      autoLock: Value(autoLock),
+      budgetThreshold: Value(budgetThreshold),
+    );
+  }
+
+  factory SettingsRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return SettingsRow(
+      id: serializer.fromJson<int>(json['id']),
+      themeMode: $AppSettingsTable.$converterthemeMode.fromJson(
+        serializer.fromJson<String>(json['themeMode']),
+      ),
+      autofill: serializer.fromJson<bool>(json['autofill']),
+      biometrics: serializer.fromJson<bool>(json['biometrics']),
+      captureAlerts: serializer.fromJson<bool>(json['captureAlerts']),
+      gmailStatements: serializer.fromJson<bool>(json['gmailStatements']),
+      autoLock: $AppSettingsTable.$converterautoLock.fromJson(
+        serializer.fromJson<String>(json['autoLock']),
+      ),
+      budgetThreshold: $AppSettingsTable.$converterbudgetThreshold.fromJson(
+        serializer.fromJson<String>(json['budgetThreshold']),
+      ),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'themeMode': serializer.toJson<String>(
+        $AppSettingsTable.$converterthemeMode.toJson(themeMode),
+      ),
+      'autofill': serializer.toJson<bool>(autofill),
+      'biometrics': serializer.toJson<bool>(biometrics),
+      'captureAlerts': serializer.toJson<bool>(captureAlerts),
+      'gmailStatements': serializer.toJson<bool>(gmailStatements),
+      'autoLock': serializer.toJson<String>(
+        $AppSettingsTable.$converterautoLock.toJson(autoLock),
+      ),
+      'budgetThreshold': serializer.toJson<String>(
+        $AppSettingsTable.$converterbudgetThreshold.toJson(budgetThreshold),
+      ),
+    };
+  }
+
+  SettingsRow copyWith({
+    int? id,
+    ThemeMode? themeMode,
+    bool? autofill,
+    bool? biometrics,
+    bool? captureAlerts,
+    bool? gmailStatements,
+    AutoLockDuration? autoLock,
+    BudgetAlertThreshold? budgetThreshold,
+  }) => SettingsRow(
+    id: id ?? this.id,
+    themeMode: themeMode ?? this.themeMode,
+    autofill: autofill ?? this.autofill,
+    biometrics: biometrics ?? this.biometrics,
+    captureAlerts: captureAlerts ?? this.captureAlerts,
+    gmailStatements: gmailStatements ?? this.gmailStatements,
+    autoLock: autoLock ?? this.autoLock,
+    budgetThreshold: budgetThreshold ?? this.budgetThreshold,
+  );
+  SettingsRow copyWithCompanion(AppSettingsCompanion data) {
+    return SettingsRow(
+      id: data.id.present ? data.id.value : this.id,
+      themeMode: data.themeMode.present ? data.themeMode.value : this.themeMode,
+      autofill: data.autofill.present ? data.autofill.value : this.autofill,
+      biometrics: data.biometrics.present
+          ? data.biometrics.value
+          : this.biometrics,
+      captureAlerts: data.captureAlerts.present
+          ? data.captureAlerts.value
+          : this.captureAlerts,
+      gmailStatements: data.gmailStatements.present
+          ? data.gmailStatements.value
+          : this.gmailStatements,
+      autoLock: data.autoLock.present ? data.autoLock.value : this.autoLock,
+      budgetThreshold: data.budgetThreshold.present
+          ? data.budgetThreshold.value
+          : this.budgetThreshold,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('SettingsRow(')
+          ..write('id: $id, ')
+          ..write('themeMode: $themeMode, ')
+          ..write('autofill: $autofill, ')
+          ..write('biometrics: $biometrics, ')
+          ..write('captureAlerts: $captureAlerts, ')
+          ..write('gmailStatements: $gmailStatements, ')
+          ..write('autoLock: $autoLock, ')
+          ..write('budgetThreshold: $budgetThreshold')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    themeMode,
+    autofill,
+    biometrics,
+    captureAlerts,
+    gmailStatements,
+    autoLock,
+    budgetThreshold,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is SettingsRow &&
+          other.id == this.id &&
+          other.themeMode == this.themeMode &&
+          other.autofill == this.autofill &&
+          other.biometrics == this.biometrics &&
+          other.captureAlerts == this.captureAlerts &&
+          other.gmailStatements == this.gmailStatements &&
+          other.autoLock == this.autoLock &&
+          other.budgetThreshold == this.budgetThreshold);
+}
+
+class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
+  final Value<int> id;
+  final Value<ThemeMode> themeMode;
+  final Value<bool> autofill;
+  final Value<bool> biometrics;
+  final Value<bool> captureAlerts;
+  final Value<bool> gmailStatements;
+  final Value<AutoLockDuration> autoLock;
+  final Value<BudgetAlertThreshold> budgetThreshold;
+  const AppSettingsCompanion({
+    this.id = const Value.absent(),
+    this.themeMode = const Value.absent(),
+    this.autofill = const Value.absent(),
+    this.biometrics = const Value.absent(),
+    this.captureAlerts = const Value.absent(),
+    this.gmailStatements = const Value.absent(),
+    this.autoLock = const Value.absent(),
+    this.budgetThreshold = const Value.absent(),
+  });
+  AppSettingsCompanion.insert({
+    this.id = const Value.absent(),
+    required ThemeMode themeMode,
+    required bool autofill,
+    required bool biometrics,
+    required bool captureAlerts,
+    required bool gmailStatements,
+    required AutoLockDuration autoLock,
+    required BudgetAlertThreshold budgetThreshold,
+  }) : themeMode = Value(themeMode),
+       autofill = Value(autofill),
+       biometrics = Value(biometrics),
+       captureAlerts = Value(captureAlerts),
+       gmailStatements = Value(gmailStatements),
+       autoLock = Value(autoLock),
+       budgetThreshold = Value(budgetThreshold);
+  static Insertable<SettingsRow> custom({
+    Expression<int>? id,
+    Expression<String>? themeMode,
+    Expression<bool>? autofill,
+    Expression<bool>? biometrics,
+    Expression<bool>? captureAlerts,
+    Expression<bool>? gmailStatements,
+    Expression<String>? autoLock,
+    Expression<String>? budgetThreshold,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (themeMode != null) 'theme_mode': themeMode,
+      if (autofill != null) 'autofill': autofill,
+      if (biometrics != null) 'biometrics': biometrics,
+      if (captureAlerts != null) 'capture_alerts': captureAlerts,
+      if (gmailStatements != null) 'gmail_statements': gmailStatements,
+      if (autoLock != null) 'auto_lock': autoLock,
+      if (budgetThreshold != null) 'budget_threshold': budgetThreshold,
+    });
+  }
+
+  AppSettingsCompanion copyWith({
+    Value<int>? id,
+    Value<ThemeMode>? themeMode,
+    Value<bool>? autofill,
+    Value<bool>? biometrics,
+    Value<bool>? captureAlerts,
+    Value<bool>? gmailStatements,
+    Value<AutoLockDuration>? autoLock,
+    Value<BudgetAlertThreshold>? budgetThreshold,
+  }) {
+    return AppSettingsCompanion(
+      id: id ?? this.id,
+      themeMode: themeMode ?? this.themeMode,
+      autofill: autofill ?? this.autofill,
+      biometrics: biometrics ?? this.biometrics,
+      captureAlerts: captureAlerts ?? this.captureAlerts,
+      gmailStatements: gmailStatements ?? this.gmailStatements,
+      autoLock: autoLock ?? this.autoLock,
+      budgetThreshold: budgetThreshold ?? this.budgetThreshold,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (themeMode.present) {
+      map['theme_mode'] = Variable<String>(
+        $AppSettingsTable.$converterthemeMode.toSql(themeMode.value),
+      );
+    }
+    if (autofill.present) {
+      map['autofill'] = Variable<bool>(autofill.value);
+    }
+    if (biometrics.present) {
+      map['biometrics'] = Variable<bool>(biometrics.value);
+    }
+    if (captureAlerts.present) {
+      map['capture_alerts'] = Variable<bool>(captureAlerts.value);
+    }
+    if (gmailStatements.present) {
+      map['gmail_statements'] = Variable<bool>(gmailStatements.value);
+    }
+    if (autoLock.present) {
+      map['auto_lock'] = Variable<String>(
+        $AppSettingsTable.$converterautoLock.toSql(autoLock.value),
+      );
+    }
+    if (budgetThreshold.present) {
+      map['budget_threshold'] = Variable<String>(
+        $AppSettingsTable.$converterbudgetThreshold.toSql(
+          budgetThreshold.value,
+        ),
+      );
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('AppSettingsCompanion(')
+          ..write('id: $id, ')
+          ..write('themeMode: $themeMode, ')
+          ..write('autofill: $autofill, ')
+          ..write('biometrics: $biometrics, ')
+          ..write('captureAlerts: $captureAlerts, ')
+          ..write('gmailStatements: $gmailStatements, ')
+          ..write('autoLock: $autoLock, ')
+          ..write('budgetThreshold: $budgetThreshold')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $BankCardsTable bankCards = $BankCardsTable(this);
+  late final $AppSettingsTable appSettings = $AppSettingsTable(this);
   late final TransactionsDao transactionsDao = TransactionsDao(
     this as AppDatabase,
   );
   late final CardsDao cardsDao = CardsDao(this as AppDatabase);
+  late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
   @override
-  List<DatabaseSchemaEntity> get allSchemaEntities => [transactions, bankCards];
+  List<DatabaseSchemaEntity> get allSchemaEntities => [
+    transactions,
+    bankCards,
+    appSettings,
+  ];
 }
 
 typedef $$TransactionsTableCreateCompanionBuilder =
@@ -2650,6 +3203,283 @@ typedef $$BankCardsTableProcessedTableManager =
       BankCardRow,
       PrefetchHooks Function()
     >;
+typedef $$AppSettingsTableCreateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<int> id,
+      required ThemeMode themeMode,
+      required bool autofill,
+      required bool biometrics,
+      required bool captureAlerts,
+      required bool gmailStatements,
+      required AutoLockDuration autoLock,
+      required BudgetAlertThreshold budgetThreshold,
+    });
+typedef $$AppSettingsTableUpdateCompanionBuilder =
+    AppSettingsCompanion Function({
+      Value<int> id,
+      Value<ThemeMode> themeMode,
+      Value<bool> autofill,
+      Value<bool> biometrics,
+      Value<bool> captureAlerts,
+      Value<bool> gmailStatements,
+      Value<AutoLockDuration> autoLock,
+      Value<BudgetAlertThreshold> budgetThreshold,
+    });
+
+class $$AppSettingsTableFilterComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<ThemeMode, ThemeMode, String> get themeMode =>
+      $composableBuilder(
+        column: $table.themeMode,
+        builder: (column) => ColumnWithTypeConverterFilters(column),
+      );
+
+  ColumnFilters<bool> get autofill => $composableBuilder(
+    column: $table.autofill,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get biometrics => $composableBuilder(
+    column: $table.biometrics,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get captureAlerts => $composableBuilder(
+    column: $table.captureAlerts,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get gmailStatements => $composableBuilder(
+    column: $table.gmailStatements,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<AutoLockDuration, AutoLockDuration, String>
+  get autoLock => $composableBuilder(
+    column: $table.autoLock,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    BudgetAlertThreshold,
+    BudgetAlertThreshold,
+    String
+  >
+  get budgetThreshold => $composableBuilder(
+    column: $table.budgetThreshold,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+}
+
+class $$AppSettingsTableOrderingComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get themeMode => $composableBuilder(
+    column: $table.themeMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get autofill => $composableBuilder(
+    column: $table.autofill,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get biometrics => $composableBuilder(
+    column: $table.biometrics,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get captureAlerts => $composableBuilder(
+    column: $table.captureAlerts,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get gmailStatements => $composableBuilder(
+    column: $table.gmailStatements,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get autoLock => $composableBuilder(
+    column: $table.autoLock,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get budgetThreshold => $composableBuilder(
+    column: $table.budgetThreshold,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$AppSettingsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $AppSettingsTable> {
+  $$AppSettingsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<ThemeMode, String> get themeMode =>
+      $composableBuilder(column: $table.themeMode, builder: (column) => column);
+
+  GeneratedColumn<bool> get autofill =>
+      $composableBuilder(column: $table.autofill, builder: (column) => column);
+
+  GeneratedColumn<bool> get biometrics => $composableBuilder(
+    column: $table.biometrics,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get captureAlerts => $composableBuilder(
+    column: $table.captureAlerts,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get gmailStatements => $composableBuilder(
+    column: $table.gmailStatements,
+    builder: (column) => column,
+  );
+
+  GeneratedColumnWithTypeConverter<AutoLockDuration, String> get autoLock =>
+      $composableBuilder(column: $table.autoLock, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BudgetAlertThreshold, String>
+  get budgetThreshold => $composableBuilder(
+    column: $table.budgetThreshold,
+    builder: (column) => column,
+  );
+}
+
+class $$AppSettingsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $AppSettingsTable,
+          SettingsRow,
+          $$AppSettingsTableFilterComposer,
+          $$AppSettingsTableOrderingComposer,
+          $$AppSettingsTableAnnotationComposer,
+          $$AppSettingsTableCreateCompanionBuilder,
+          $$AppSettingsTableUpdateCompanionBuilder,
+          (
+            SettingsRow,
+            BaseReferences<_$AppDatabase, $AppSettingsTable, SettingsRow>,
+          ),
+          SettingsRow,
+          PrefetchHooks Function()
+        > {
+  $$AppSettingsTableTableManager(_$AppDatabase db, $AppSettingsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$AppSettingsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$AppSettingsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$AppSettingsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<ThemeMode> themeMode = const Value.absent(),
+                Value<bool> autofill = const Value.absent(),
+                Value<bool> biometrics = const Value.absent(),
+                Value<bool> captureAlerts = const Value.absent(),
+                Value<bool> gmailStatements = const Value.absent(),
+                Value<AutoLockDuration> autoLock = const Value.absent(),
+                Value<BudgetAlertThreshold> budgetThreshold =
+                    const Value.absent(),
+              }) => AppSettingsCompanion(
+                id: id,
+                themeMode: themeMode,
+                autofill: autofill,
+                biometrics: biometrics,
+                captureAlerts: captureAlerts,
+                gmailStatements: gmailStatements,
+                autoLock: autoLock,
+                budgetThreshold: budgetThreshold,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required ThemeMode themeMode,
+                required bool autofill,
+                required bool biometrics,
+                required bool captureAlerts,
+                required bool gmailStatements,
+                required AutoLockDuration autoLock,
+                required BudgetAlertThreshold budgetThreshold,
+              }) => AppSettingsCompanion.insert(
+                id: id,
+                themeMode: themeMode,
+                autofill: autofill,
+                biometrics: biometrics,
+                captureAlerts: captureAlerts,
+                gmailStatements: gmailStatements,
+                autoLock: autoLock,
+                budgetThreshold: budgetThreshold,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$AppSettingsTable, SettingsRow>(table),
+                  BaseReferences<_$AppDatabase, $AppSettingsTable, SettingsRow>(
+                    db,
+                    table,
+                    e,
+                  ),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$AppSettingsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $AppSettingsTable,
+      SettingsRow,
+      $$AppSettingsTableFilterComposer,
+      $$AppSettingsTableOrderingComposer,
+      $$AppSettingsTableAnnotationComposer,
+      $$AppSettingsTableCreateCompanionBuilder,
+      $$AppSettingsTableUpdateCompanionBuilder,
+      (
+        SettingsRow,
+        BaseReferences<_$AppDatabase, $AppSettingsTable, SettingsRow>,
+      ),
+      SettingsRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2658,4 +3488,6 @@ class $AppDatabaseManager {
       $$TransactionsTableTableManager(_db, _db.transactions);
   $$BankCardsTableTableManager get bankCards =>
       $$BankCardsTableTableManager(_db, _db.bankCards);
+  $$AppSettingsTableTableManager get appSettings =>
+      $$AppSettingsTableTableManager(_db, _db.appSettings);
 }
