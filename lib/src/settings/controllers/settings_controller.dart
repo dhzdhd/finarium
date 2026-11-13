@@ -6,9 +6,12 @@ import 'package:finarium/src/settings/enums/auto_lock_duration.dart';
 import 'package:finarium/src/settings/enums/budget_alert_threshold.dart';
 import 'package:finarium/src/settings/models/settings.dart';
 import 'package:flutter/material.dart' show ThemeMode;
+import 'package:logging/logging.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 part 'settings_controller.g.dart';
+
+final _log = Logger('SettingsController');
 
 @Riverpod(keepAlive: true)
 SettingsDao settingsDao(Ref ref) => ref.watch(appDatabaseProvider).settingsDao;
@@ -59,8 +62,8 @@ class SettingsController extends _$SettingsController {
   Future<void> _persist(Settings settings) async {
     try {
       await ref.read(settingsDaoProvider).save(settings);
-    } catch (_) {
-      // The in-memory value stays; the next change retries the save.
+    } catch (error, stackTrace) {
+      _log.severe('Could not save settings', error, stackTrace);
     }
   }
 }
