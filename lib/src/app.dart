@@ -40,6 +40,11 @@ class NavScaffold extends ConsumerWidget {
     );
   }
 
+  PreferredSizeWidget? _appBar(Route route) {
+    if (route is CategoriesRoute) return null;
+    return AppBar(title: Text(route.name));
+  }
+
   Widget? _floatingActionButton(BuildContext context, Route route) {
     return switch (route) {
       TransactionsRoute() => FloatingActionButton.extended(
@@ -68,7 +73,7 @@ class NavScaffold extends ConsumerWidget {
 
     if (width < Breakpoints.desktop) {
       return Scaffold(
-        appBar: AppBar(title: Text(currentRoute.name)),
+        appBar: _appBar(currentRoute),
         body: navShell,
         floatingActionButton: _floatingActionButton(context, currentRoute),
         bottomNavigationBar: NavigationBar(
@@ -111,7 +116,7 @@ class NavScaffold extends ConsumerWidget {
           const VerticalDivider(width: 1),
           Expanded(
             child: Scaffold(
-              appBar: AppBar(title: Text(currentRoute.name)),
+              appBar: _appBar(currentRoute),
               body: navShell,
               floatingActionButton: _floatingActionButton(context, currentRoute),
             ),

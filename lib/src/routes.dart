@@ -1,5 +1,6 @@
 import 'package:finarium/src/analytics/views/analytics_view.dart';
 import 'package:finarium/src/budgets/views/budgets_view.dart';
+import 'package:finarium/src/categories/views/categories_screen.dart';
 import 'package:finarium/src/cards/views/cards_view.dart';
 import 'package:finarium/src/app.dart';
 import 'package:finarium/src/settings/views/settings_view.dart';
@@ -100,10 +101,28 @@ final class AnalyticsRoute() implements Route {
   Widget call() => AnalyticsView();
 }
 
+final class CategoriesRoute() implements Route {
+  @override
+  String get name => 'Categories';
+
+  @override
+  String get path => '/categories';
+
+  @override
+  Icon get icon => const Icon(Icons.category_outlined);
+
+  @override
+  Icon get selectedIcon => const Icon(Icons.category);
+
+  @override
+  Widget call() => CategoriesScreen();
+}
+
 final routes = [
   TransactionsRoute(),
   CardsRoute(),
   BudgetsRoute(),
+  CategoriesRoute(),
   AnalyticsRoute(),
   SettingsRoute(),
 ];
