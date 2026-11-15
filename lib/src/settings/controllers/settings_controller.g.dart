@@ -21,7 +21,7 @@ final class SettingsDaoProvider
         argument: null,
         retry: null,
         name: r'settingsDaoProvider',
-        isAutoDispose: true,
+        isAutoDispose: false,
         dependencies: null,
         $allTransitiveDependencies: null,
       );
@@ -48,7 +48,7 @@ final class SettingsDaoProvider
   }
 }
 
-String _$settingsDaoHash() => r'44f3d580e6459e0377116afcd80208cfc18b4c91';
+String _$settingsDaoHash() => r'a0a5073bee4b1c7ab22a219c1b79798d6aef8421';
 
 @ProviderFor(SettingsController)
 final settingsControllerProvider = SettingsControllerProvider._();
@@ -75,7 +75,7 @@ final class SettingsControllerProvider
 }
 
 String _$settingsControllerHash() =>
-    r'6db437f8c4727e363f2b27a5eebbc9f4902c521b';
+    r'9e0f6a430a7e708d2a886b54b4b85642ea9e343f';
 
 abstract class _$SettingsController extends $AsyncNotifier<Settings> {
   FutureOr<Settings> build();

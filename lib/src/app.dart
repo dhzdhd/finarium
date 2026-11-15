@@ -1,3 +1,4 @@
+import 'package:finarium/src/budgets/widgets/add_budget_sheet.dart';
 import 'package:finarium/src/cards/widgets/add_card_dialog.dart';
 import 'package:finarium/src/core/breakpoints.dart';
 import 'package:finarium/src/routes.dart';
@@ -50,6 +51,11 @@ class NavScaffold extends ConsumerWidget {
         label: const Text('Add card'),
         icon: const Icon(Icons.add),
         onPressed: () => AddCardDialog.show(context),
+      ),
+      BudgetsRoute() => FloatingActionButton.extended(
+        label: const Text('Add budget'),
+        icon: const Icon(Icons.add),
+        onPressed: () => AddBudgetSheet.show(context),
       ),
       _ => null,
     };

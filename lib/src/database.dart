@@ -1,5 +1,9 @@
 import 'package:drift/drift.dart';
 import 'package:drift_flutter/drift_flutter.dart' show driftDatabase;
+import 'package:finarium/src/budgets/daos/budgets_dao.dart';
+import 'package:finarium/src/budgets/enums/budget_period.dart';
+import 'package:finarium/src/budgets/models/budget_plan.dart' show BudgetAllocation;
+import 'package:finarium/src/budgets/tables/budget_plans_table.dart';
 import 'package:finarium/src/cards/daos/cards_dao.dart';
 import 'package:finarium/src/cards/tables/bank_cards_table.dart';
 import 'package:finarium/src/settings/daos/settings_dao.dart';
@@ -16,8 +20,8 @@ import 'package:flutter/material.dart' show ThemeMode;
 part 'database.g.dart';
 
 @DriftDatabase(
-  tables: [Transactions, BankCards, AppSettings],
-  daos: [TransactionsDao, CardsDao, SettingsDao],
+  tables: [Transactions, BankCards, AppSettings, BudgetPlans],
+  daos: [TransactionsDao, CardsDao, SettingsDao, BudgetsDao],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(driftDatabase(name: 'finarium'));

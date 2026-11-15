@@ -2342,17 +2342,552 @@ class AppSettingsCompanion extends UpdateCompanion<SettingsRow> {
   }
 }
 
+class $BudgetPlansTable extends BudgetPlans
+    with TableInfo<$BudgetPlansTable, BudgetPlanRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $BudgetPlansTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<String> id = GeneratedColumn<String>(
+    'id',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<BudgetPeriod, String> period =
+      GeneratedColumn<String>(
+        'period',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<BudgetPeriod>($BudgetPlansTable.$converterperiod);
+  static const VerificationMeta _totalMinorMeta = const VerificationMeta(
+    'totalMinor',
+  );
+  @override
+  late final GeneratedColumn<int> totalMinor = GeneratedColumn<int>(
+    'total_minor',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _customStartMeta = const VerificationMeta(
+    'customStart',
+  );
+  @override
+  late final GeneratedColumn<DateTime> customStart = GeneratedColumn<DateTime>(
+    'custom_start',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _customEndMeta = const VerificationMeta(
+    'customEnd',
+  );
+  @override
+  late final GeneratedColumn<DateTime> customEnd = GeneratedColumn<DateTime>(
+    'custom_end',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<List<BudgetAllocation>, String>
+  allocations =
+      GeneratedColumn<String>(
+        'allocations',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<List<BudgetAllocation>>(
+        $BudgetPlansTable.$converterallocations,
+      );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    period,
+    totalMinor,
+    customStart,
+    customEnd,
+    allocations,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'budget_plans';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<BudgetPlanRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    } else if (isInserting) {
+      context.missing(_idMeta);
+    }
+    if (data.containsKey('total_minor')) {
+      context.handle(
+        _totalMinorMeta,
+        totalMinor.isAcceptableOrUnknown(data['total_minor']!, _totalMinorMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_totalMinorMeta);
+    }
+    if (data.containsKey('custom_start')) {
+      context.handle(
+        _customStartMeta,
+        customStart.isAcceptableOrUnknown(
+          data['custom_start']!,
+          _customStartMeta,
+        ),
+      );
+    }
+    if (data.containsKey('custom_end')) {
+      context.handle(
+        _customEndMeta,
+        customEnd.isAcceptableOrUnknown(data['custom_end']!, _customEndMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_updatedAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  BudgetPlanRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return BudgetPlanRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}id'],
+      )!,
+      period: $BudgetPlansTable.$converterperiod.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}period'],
+        )!,
+      ),
+      totalMinor: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}total_minor'],
+      )!,
+      customStart: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}custom_start'],
+      ),
+      customEnd: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}custom_end'],
+      ),
+      allocations: $BudgetPlansTable.$converterallocations.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}allocations'],
+        )!,
+      ),
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $BudgetPlansTable createAlias(String alias) {
+    return $BudgetPlansTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<BudgetPeriod, String, String> $converterperiod =
+      const EnumNameConverter<BudgetPeriod>(BudgetPeriod.values);
+  static TypeConverter<List<BudgetAllocation>, String> $converterallocations =
+      const BudgetAllocationsConverter();
+}
+
+class BudgetPlanRow extends DataClass implements Insertable<BudgetPlanRow> {
+  final String id;
+  final BudgetPeriod period;
+  final int totalMinor;
+  final DateTime? customStart;
+  final DateTime? customEnd;
+  final List<BudgetAllocation> allocations;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const BudgetPlanRow({
+    required this.id,
+    required this.period,
+    required this.totalMinor,
+    this.customStart,
+    this.customEnd,
+    required this.allocations,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<String>(id);
+    {
+      map['period'] = Variable<String>(
+        $BudgetPlansTable.$converterperiod.toSql(period),
+      );
+    }
+    map['total_minor'] = Variable<int>(totalMinor);
+    if (!nullToAbsent || customStart != null) {
+      map['custom_start'] = Variable<DateTime>(customStart);
+    }
+    if (!nullToAbsent || customEnd != null) {
+      map['custom_end'] = Variable<DateTime>(customEnd);
+    }
+    {
+      map['allocations'] = Variable<String>(
+        $BudgetPlansTable.$converterallocations.toSql(allocations),
+      );
+    }
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  BudgetPlansCompanion toCompanion(bool nullToAbsent) {
+    return BudgetPlansCompanion(
+      id: Value(id),
+      period: Value(period),
+      totalMinor: Value(totalMinor),
+      customStart: customStart == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customStart),
+      customEnd: customEnd == null && nullToAbsent
+          ? const Value.absent()
+          : Value(customEnd),
+      allocations: Value(allocations),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory BudgetPlanRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return BudgetPlanRow(
+      id: serializer.fromJson<String>(json['id']),
+      period: $BudgetPlansTable.$converterperiod.fromJson(
+        serializer.fromJson<String>(json['period']),
+      ),
+      totalMinor: serializer.fromJson<int>(json['totalMinor']),
+      customStart: serializer.fromJson<DateTime?>(json['customStart']),
+      customEnd: serializer.fromJson<DateTime?>(json['customEnd']),
+      allocations: serializer.fromJson<List<BudgetAllocation>>(
+        json['allocations'],
+      ),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<String>(id),
+      'period': serializer.toJson<String>(
+        $BudgetPlansTable.$converterperiod.toJson(period),
+      ),
+      'totalMinor': serializer.toJson<int>(totalMinor),
+      'customStart': serializer.toJson<DateTime?>(customStart),
+      'customEnd': serializer.toJson<DateTime?>(customEnd),
+      'allocations': serializer.toJson<List<BudgetAllocation>>(allocations),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  BudgetPlanRow copyWith({
+    String? id,
+    BudgetPeriod? period,
+    int? totalMinor,
+    Value<DateTime?> customStart = const Value.absent(),
+    Value<DateTime?> customEnd = const Value.absent(),
+    List<BudgetAllocation>? allocations,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => BudgetPlanRow(
+    id: id ?? this.id,
+    period: period ?? this.period,
+    totalMinor: totalMinor ?? this.totalMinor,
+    customStart: customStart.present ? customStart.value : this.customStart,
+    customEnd: customEnd.present ? customEnd.value : this.customEnd,
+    allocations: allocations ?? this.allocations,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  BudgetPlanRow copyWithCompanion(BudgetPlansCompanion data) {
+    return BudgetPlanRow(
+      id: data.id.present ? data.id.value : this.id,
+      period: data.period.present ? data.period.value : this.period,
+      totalMinor: data.totalMinor.present
+          ? data.totalMinor.value
+          : this.totalMinor,
+      customStart: data.customStart.present
+          ? data.customStart.value
+          : this.customStart,
+      customEnd: data.customEnd.present ? data.customEnd.value : this.customEnd,
+      allocations: data.allocations.present
+          ? data.allocations.value
+          : this.allocations,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetPlanRow(')
+          ..write('id: $id, ')
+          ..write('period: $period, ')
+          ..write('totalMinor: $totalMinor, ')
+          ..write('customStart: $customStart, ')
+          ..write('customEnd: $customEnd, ')
+          ..write('allocations: $allocations, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    period,
+    totalMinor,
+    customStart,
+    customEnd,
+    allocations,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is BudgetPlanRow &&
+          other.id == this.id &&
+          other.period == this.period &&
+          other.totalMinor == this.totalMinor &&
+          other.customStart == this.customStart &&
+          other.customEnd == this.customEnd &&
+          other.allocations == this.allocations &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class BudgetPlansCompanion extends UpdateCompanion<BudgetPlanRow> {
+  final Value<String> id;
+  final Value<BudgetPeriod> period;
+  final Value<int> totalMinor;
+  final Value<DateTime?> customStart;
+  final Value<DateTime?> customEnd;
+  final Value<List<BudgetAllocation>> allocations;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const BudgetPlansCompanion({
+    this.id = const Value.absent(),
+    this.period = const Value.absent(),
+    this.totalMinor = const Value.absent(),
+    this.customStart = const Value.absent(),
+    this.customEnd = const Value.absent(),
+    this.allocations = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  BudgetPlansCompanion.insert({
+    required String id,
+    required BudgetPeriod period,
+    required int totalMinor,
+    this.customStart = const Value.absent(),
+    this.customEnd = const Value.absent(),
+    required List<BudgetAllocation> allocations,
+    required DateTime createdAt,
+    required DateTime updatedAt,
+    this.rowid = const Value.absent(),
+  }) : id = Value(id),
+       period = Value(period),
+       totalMinor = Value(totalMinor),
+       allocations = Value(allocations),
+       createdAt = Value(createdAt),
+       updatedAt = Value(updatedAt);
+  static Insertable<BudgetPlanRow> custom({
+    Expression<String>? id,
+    Expression<String>? period,
+    Expression<int>? totalMinor,
+    Expression<DateTime>? customStart,
+    Expression<DateTime>? customEnd,
+    Expression<String>? allocations,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (period != null) 'period': period,
+      if (totalMinor != null) 'total_minor': totalMinor,
+      if (customStart != null) 'custom_start': customStart,
+      if (customEnd != null) 'custom_end': customEnd,
+      if (allocations != null) 'allocations': allocations,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  BudgetPlansCompanion copyWith({
+    Value<String>? id,
+    Value<BudgetPeriod>? period,
+    Value<int>? totalMinor,
+    Value<DateTime?>? customStart,
+    Value<DateTime?>? customEnd,
+    Value<List<BudgetAllocation>>? allocations,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return BudgetPlansCompanion(
+      id: id ?? this.id,
+      period: period ?? this.period,
+      totalMinor: totalMinor ?? this.totalMinor,
+      customStart: customStart ?? this.customStart,
+      customEnd: customEnd ?? this.customEnd,
+      allocations: allocations ?? this.allocations,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<String>(id.value);
+    }
+    if (period.present) {
+      map['period'] = Variable<String>(
+        $BudgetPlansTable.$converterperiod.toSql(period.value),
+      );
+    }
+    if (totalMinor.present) {
+      map['total_minor'] = Variable<int>(totalMinor.value);
+    }
+    if (customStart.present) {
+      map['custom_start'] = Variable<DateTime>(customStart.value);
+    }
+    if (customEnd.present) {
+      map['custom_end'] = Variable<DateTime>(customEnd.value);
+    }
+    if (allocations.present) {
+      map['allocations'] = Variable<String>(
+        $BudgetPlansTable.$converterallocations.toSql(allocations.value),
+      );
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('BudgetPlansCompanion(')
+          ..write('id: $id, ')
+          ..write('period: $period, ')
+          ..write('totalMinor: $totalMinor, ')
+          ..write('customStart: $customStart, ')
+          ..write('customEnd: $customEnd, ')
+          ..write('allocations: $allocations, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $TransactionsTable transactions = $TransactionsTable(this);
   late final $BankCardsTable bankCards = $BankCardsTable(this);
   late final $AppSettingsTable appSettings = $AppSettingsTable(this);
+  late final $BudgetPlansTable budgetPlans = $BudgetPlansTable(this);
   late final TransactionsDao transactionsDao = TransactionsDao(
     this as AppDatabase,
   );
   late final CardsDao cardsDao = CardsDao(this as AppDatabase);
   late final SettingsDao settingsDao = SettingsDao(this as AppDatabase);
+  late final BudgetsDao budgetsDao = BudgetsDao(this as AppDatabase);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -2361,6 +2896,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     transactions,
     bankCards,
     appSettings,
+    budgetPlans,
   ];
 }
 
@@ -3480,6 +4016,286 @@ typedef $$AppSettingsTableProcessedTableManager =
       SettingsRow,
       PrefetchHooks Function()
     >;
+typedef $$BudgetPlansTableCreateCompanionBuilder =
+    BudgetPlansCompanion Function({
+      required String id,
+      required BudgetPeriod period,
+      required int totalMinor,
+      Value<DateTime?> customStart,
+      Value<DateTime?> customEnd,
+      required List<BudgetAllocation> allocations,
+      required DateTime createdAt,
+      required DateTime updatedAt,
+      Value<int> rowid,
+    });
+typedef $$BudgetPlansTableUpdateCompanionBuilder =
+    BudgetPlansCompanion Function({
+      Value<String> id,
+      Value<BudgetPeriod> period,
+      Value<int> totalMinor,
+      Value<DateTime?> customStart,
+      Value<DateTime?> customEnd,
+      Value<List<BudgetAllocation>> allocations,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$BudgetPlansTableFilterComposer
+    extends Composer<_$AppDatabase, $BudgetPlansTable> {
+  $$BudgetPlansTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<BudgetPeriod, BudgetPeriod, String>
+  get period => $composableBuilder(
+    column: $table.period,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<int> get totalMinor => $composableBuilder(
+    column: $table.totalMinor,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get customStart => $composableBuilder(
+    column: $table.customStart,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get customEnd => $composableBuilder(
+    column: $table.customEnd,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    List<BudgetAllocation>,
+    List<BudgetAllocation>,
+    String
+  >
+  get allocations => $composableBuilder(
+    column: $table.allocations,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$BudgetPlansTableOrderingComposer
+    extends Composer<_$AppDatabase, $BudgetPlansTable> {
+  $$BudgetPlansTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get period => $composableBuilder(
+    column: $table.period,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get totalMinor => $composableBuilder(
+    column: $table.totalMinor,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get customStart => $composableBuilder(
+    column: $table.customStart,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get customEnd => $composableBuilder(
+    column: $table.customEnd,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get allocations => $composableBuilder(
+    column: $table.allocations,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$BudgetPlansTableAnnotationComposer
+    extends Composer<_$AppDatabase, $BudgetPlansTable> {
+  $$BudgetPlansTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<String> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<BudgetPeriod, String> get period =>
+      $composableBuilder(column: $table.period, builder: (column) => column);
+
+  GeneratedColumn<int> get totalMinor => $composableBuilder(
+    column: $table.totalMinor,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get customStart => $composableBuilder(
+    column: $table.customStart,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get customEnd =>
+      $composableBuilder(column: $table.customEnd, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<List<BudgetAllocation>, String>
+  get allocations => $composableBuilder(
+    column: $table.allocations,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$BudgetPlansTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $BudgetPlansTable,
+          BudgetPlanRow,
+          $$BudgetPlansTableFilterComposer,
+          $$BudgetPlansTableOrderingComposer,
+          $$BudgetPlansTableAnnotationComposer,
+          $$BudgetPlansTableCreateCompanionBuilder,
+          $$BudgetPlansTableUpdateCompanionBuilder,
+          (
+            BudgetPlanRow,
+            BaseReferences<_$AppDatabase, $BudgetPlansTable, BudgetPlanRow>,
+          ),
+          BudgetPlanRow,
+          PrefetchHooks Function()
+        > {
+  $$BudgetPlansTableTableManager(_$AppDatabase db, $BudgetPlansTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$BudgetPlansTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$BudgetPlansTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$BudgetPlansTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<String> id = const Value.absent(),
+                Value<BudgetPeriod> period = const Value.absent(),
+                Value<int> totalMinor = const Value.absent(),
+                Value<DateTime?> customStart = const Value.absent(),
+                Value<DateTime?> customEnd = const Value.absent(),
+                Value<List<BudgetAllocation>> allocations =
+                    const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => BudgetPlansCompanion(
+                id: id,
+                period: period,
+                totalMinor: totalMinor,
+                customStart: customStart,
+                customEnd: customEnd,
+                allocations: allocations,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required String id,
+                required BudgetPeriod period,
+                required int totalMinor,
+                Value<DateTime?> customStart = const Value.absent(),
+                Value<DateTime?> customEnd = const Value.absent(),
+                required List<BudgetAllocation> allocations,
+                required DateTime createdAt,
+                required DateTime updatedAt,
+                Value<int> rowid = const Value.absent(),
+              }) => BudgetPlansCompanion.insert(
+                id: id,
+                period: period,
+                totalMinor: totalMinor,
+                customStart: customStart,
+                customEnd: customEnd,
+                allocations: allocations,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$BudgetPlansTable, BudgetPlanRow>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $BudgetPlansTable,
+                    BudgetPlanRow
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$BudgetPlansTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $BudgetPlansTable,
+      BudgetPlanRow,
+      $$BudgetPlansTableFilterComposer,
+      $$BudgetPlansTableOrderingComposer,
+      $$BudgetPlansTableAnnotationComposer,
+      $$BudgetPlansTableCreateCompanionBuilder,
+      $$BudgetPlansTableUpdateCompanionBuilder,
+      (
+        BudgetPlanRow,
+        BaseReferences<_$AppDatabase, $BudgetPlansTable, BudgetPlanRow>,
+      ),
+      BudgetPlanRow,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3490,4 +4306,6 @@ class $AppDatabaseManager {
       $$BankCardsTableTableManager(_db, _db.bankCards);
   $$AppSettingsTableTableManager get appSettings =>
       $$AppSettingsTableTableManager(_db, _db.appSettings);
+  $$BudgetPlansTableTableManager get budgetPlans =>
+      $$BudgetPlansTableTableManager(_db, _db.budgetPlans);
 }
